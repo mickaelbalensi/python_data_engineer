@@ -10,11 +10,6 @@ COPY requirements.txt /app/
 # Install dependencies
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Install curl and download the wait-for-it.sh script
-RUN apt-get update && apt-get install -y curl
-RUN curl -o /app/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
-RUN chmod +x /app/wait-for-it.sh
-
 # Now copy the rest of the application code
 COPY . /app/
 

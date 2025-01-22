@@ -1,19 +1,22 @@
 version: '3.8'
 
 services:
-  fetcher:
-    image: mickaelbalensi/fetcher
-    build: ./fetcher
-    container_name: fetcher-container
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: rabbitmq
     networks:
       - wiki_scraper_network
-    environment:
-      - RABBITMQ_HOST=rabbitmq
-    depends_on:
-      - rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   parser:
-    image: mickaelbalensi/parser
+    image: mickaelbalensi/parser:latest
     build: ./parser
     container_name: parser-container
     networks:
@@ -21,18 +24,20 @@ services:
     environment:
       - RABBITMQ_HOST=rabbitmq
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
 
-  rabbitmq:
-    image: "rabbitmq:3-management"
-    container_name: rabbitmq
+  fetcher:
+    image: mickaelbalensi/fetcher:latest
+    build: ./fetcher
+    container_name: fetcher-container
     networks:
       - wiki_scraper_network
-    ports:
-      - "15672:15672"  # For the management interface
-      - "5672:5672"    # For RabbitMQ connections
-
-  # You can add more services like Filter or a web server, if needed
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
 networks:
   wiki_scraper_network:
