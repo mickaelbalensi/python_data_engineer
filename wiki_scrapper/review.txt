@@ -1,0 +1,5 @@
+volume 
+redis 
+rabbitmq
+network part from docker compose
+
