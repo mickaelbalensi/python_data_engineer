@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   fetcher:
+    image: mickaelbalensi/fetcher
     build: ./fetcher
     container_name: fetcher-container
     networks:
@@ -12,6 +13,7 @@ services:
       - rabbitmq
 
   parser:
+    image: mickaelbalensi/parser
     build: ./parser
     container_name: parser-container
     networks:
