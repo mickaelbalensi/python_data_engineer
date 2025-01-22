@@ -1,7 +1,7 @@
 import pika
 
 class PongConsumer:
-    def __init__(self, queue_name='parser_queue', host='localhost'):
+    def __init__(self, queue_name='parser_queue', host='rabbitmq'):
         self.queue_name = queue_name
         self.host = host
         self.connection = None

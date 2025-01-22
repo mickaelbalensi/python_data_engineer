@@ -1,7 +1,37 @@
 version: '3.8'
+
 services:
+  fetcher:
+    build: ./fetcher
+    container_name: fetcher-container
+    networks:
+      - wiki_scraper_network
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - rabbitmq
+
+  parser:
+    build: ./parser
+    container_name: parser-container
+    networks:
+      - wiki_scraper_network
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - rabbitmq
+
   rabbitmq:
-    image: rabbitmq:3-management
+    image: "rabbitmq:3-management"
+    container_name: rabbitmq
+    networks:
+      - wiki_scraper_network
     ports:
-      - "5672:5672"
-      - "15672:15672"  # Management UI
+      - "15672:15672"  # For the management interface
+      - "5672:5672"    # For RabbitMQ connections
+
+  # You can add more services like Filter or a web server, if needed
+
+networks:
+  wiki_scraper_network:
+    driver: bridge

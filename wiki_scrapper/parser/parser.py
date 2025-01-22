@@ -1,17 +1,20 @@
 import pika
-
+import subprocess
 class Parser:
-    def __init__(self, fetch_queue='fetch_queue', parser_queue='parser_queue', host='localhost'):
+    def __init__(self, port, fetch_queue='fetch_queue', parser_queue='parser_queue', host='localhost'):
         self.fetch_queue = fetch_queue
         self.parser_queue = parser_queue
         self.host = host
+        self.port = port
         self.connection = None
         self.channel = None
         self.pong_num = 0
 
     def connect(self):
         """Connect to RabbitMQ and declare the queues."""
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.host))
+        subprocess.run(["/app/wait-for-it.sh", "rabbitmq:5672", "--", "echo", "RabbitMQ is ready!"])
+        
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.host, self.port))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=self.fetch_queue)
         self.channel.queue_declare(queue=self.parser_queue)
@@ -33,6 +36,7 @@ class Parser:
             print(f"Parser sent: {response}")
             self.pong_num += 1
 
+    
     def close(self):
         """Close the connection."""
         if self.connection:
@@ -41,6 +45,6 @@ class Parser:
 
 # Usage
 if __name__ == "__main__":
-    parser = Parser()
+    parser = Parser(port= 5672, host='rabbitmq')
     parser.connect()
     parser.start()

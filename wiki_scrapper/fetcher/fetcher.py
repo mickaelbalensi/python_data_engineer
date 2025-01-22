@@ -1,16 +1,18 @@
 import pika
 import time
-
+import subprocess
 class Fetcher:
-    def __init__(self, queue_name='fetch_queue', host='localhost'):
+    def __init__(self, port, queue_name='fetch_queue', host='localhost'):
         self.queue_name = queue_name
         self.host = host
         self.connection = None
         self.channel = None
+        self.port = port
 
     def connect(self):
         """Connect to RabbitMQ and declare the queue."""
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.host))
+        subprocess.run(["/app/wait-for-it.sh", "rabbitmq:5672", "--", "echo", "RabbitMQ is ready!"])
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.host, self.port))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=self.queue_name)
         print(f"Connected to RabbitMQ on {self.host}, queue: {self.queue_name}")
@@ -38,6 +40,6 @@ class Fetcher:
 
 # Usage
 if __name__ == "__main__":
-    fetcher = Fetcher()
+    fetcher = Fetcher(port= 5672, host='rabbitmq')
     fetcher.connect()
     fetcher.send_ping()
