@@ -10,7 +10,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 FIRST_URL = "https://en.wikipedia.org/wiki/Web_scraping"
-RABBIT_HOST = 'rabbitmq'
 PORT = 5672
 
 
@@ -102,7 +101,8 @@ class Fetcher:
 
 # Usage
 if __name__ == "__main__":
-    fetcher = Fetcher(host=RABBIT_HOST, port=PORT)
+    rabbitmq_host = os.environ.get('RABBITMQ_HOST', 'localhost')
+    fetcher = Fetcher(host=rabbitmq_host, port=PORT)
     fetcher.connect()
     fetcher.seed_queue(FIRST_URL)
     fetcher.start()

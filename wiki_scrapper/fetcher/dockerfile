@@ -10,7 +10,7 @@ COPY requirements.txt /app/
 # Install dependencies
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-
+ENV RABBITMQ_HOST=rabbitmq
 # Now copy the rest of the application code
 COPY . /app/
 
