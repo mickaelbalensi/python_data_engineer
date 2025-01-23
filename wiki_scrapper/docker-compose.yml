@@ -38,6 +38,8 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+    volumes:
+      - ./html_pages:/app/html_pages
 
 networks:
   wiki_scraper_network:

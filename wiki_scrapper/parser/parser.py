@@ -30,7 +30,7 @@ class Parser:
 
     def start(self):
         """Start consuming messages."""
-        self.channel.basic_consume(queue=self.fetch_queue, on_message_callback=self.process_message, auto_ack=True)
+        self.channel.basic_consume(queue=self.parser_queue, on_message_callback=self.process_message, auto_ack=True)
         logger.info("Parser is consuming...")
         self.channel.start_consuming()
 
