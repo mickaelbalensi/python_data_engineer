@@ -30,6 +30,21 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - wiki_scraper_network
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # volumes:
+      # - redis_data:/data
+
   parser:
     image: mickaelbalensi/parser:latest
     build: ./parser
@@ -62,7 +77,23 @@ services:
     volumes:
       - ./html_pages:/app/html_pages
 
-  
+  filter:
+    image: mickaelbalensi/filter:latest
+    build:
+      context: ./filter
+    container_name: filter-container
+    networks:
+      - wiki_scraper_network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
 networks:
   wiki_scraper_network:
@@ -70,3 +101,4 @@ networks:
 
 volumes:
   mongo_data:
+  redis_data:

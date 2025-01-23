@@ -13,9 +13,9 @@ logger = logging.getLogger('Parser')
 
 
 class Parser:
-    def __init__(self, port, filter_queue='filter_queue', parser_queue='parser_queue', host='localhost'):
-        self.filter_queue = filter_queue
-        self.parser_queue = parser_queue
+    def __init__(self, port, consume_queue='parser_queue', produce_queue='filter_queue', host='localhost'):
+        self.produce_queue = produce_queue
+        self.consume_queue = consume_queue
         self.host = host
         self.port = port
         self.connection = None
@@ -26,13 +26,13 @@ class Parser:
         time.sleep(2)
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.host, self.port))
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.filter_queue)
-        self.channel.queue_declare(queue=self.parser_queue)
-        logger.info(f"Connected to RabbitMQ on {self.host}, queues: {self.filter_queue}, {self.parser_queue}")
+        self.channel.queue_declare(queue=self.produce_queue)
+        self.channel.queue_declare(queue=self.consume_queue)
+        logger.info(f"Connected to RabbitMQ on {self.host}, queues: {self.produce_queue}, {self.consume_queue}")
 
     def start(self):
         """Start consuming messages."""
-        self.channel.basic_consume(queue=self.parser_queue, on_message_callback=self.process_message, auto_ack=True)
+        self.channel.basic_consume(queue=self.consume_queue, on_message_callback=self.process_message, auto_ack=True)
         logger.info("Parser is consuming...")
         self.channel.start_consuming()
 
@@ -51,8 +51,8 @@ class Parser:
         logger.info(f"Cleaned URL: {cleaned_url}")
 
         # Send the cleaned URL back to the fetch_queue
-        self.channel.basic_publish(exchange='', routing_key=self.filter_queue, body=cleaned_url)
-        logger.info(f"Cleaned URL sent to fetch queue: {cleaned_url}")
+        self.channel.basic_publish(exchange='', routing_key=self.produce_queue, body=cleaned_url)
+        logger.info(f"Cleaned URL sent to {self.produce_queue}: {cleaned_url}")
 
     def is_valid_wiki_url(self, url):
         """Check if the URL belongs to Wikipedia."""

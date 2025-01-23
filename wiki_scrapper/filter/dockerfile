@@ -1,0 +1,17 @@
+# Use the official Python image as the base image
+FROM python:3.10-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the requirements file and install dependencies
+COPY requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# Copy the filter script and any additional source files
+COPY . /app
+
+# Set the default command to run the filter
+CMD ["python", "filter.py"]
