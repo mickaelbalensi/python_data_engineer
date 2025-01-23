@@ -15,6 +15,21 @@ services:
       timeout: 5s
       retries: 5
 
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    networks:
+      - wiki_scraper_network
+    ports:
+      - "27017:27017"  # MongoDB default port
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mongo_data:/data/db
+
   parser:
     image: mickaelbalensi/parser:latest
     build: ./parser
@@ -26,6 +41,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+      
 
   fetcher:
     image: mickaelbalensi/fetcher:latest
@@ -35,12 +51,20 @@ services:
       - wiki_scraper_network
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - MONGO_URI=mongodb://mongo:27017
     depends_on:
       rabbitmq:
+        condition: service_healthy
+      mongo:
         condition: service_healthy
     volumes:
       - ./html_pages:/app/html_pages
 
+  
+
 networks:
   wiki_scraper_network:
     driver: bridge
+
+volumes:
+  mongo_data:

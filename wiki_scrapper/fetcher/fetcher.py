@@ -1,16 +1,23 @@
 import requests
+import pymongo
 from bs4 import BeautifulSoup
 import pika
 import logging
 import json
 import os
 
+# MongoDB setup
+client = pymongo.MongoClient(os.environ.get('MONGO_URI', "mongodb://mongo:27017"))
+db = client.wiki_scraper
+links_collection = db.links
+
+
 # Configure logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 FIRST_URL = "https://en.wikipedia.org/wiki/Web_scraping"
-PORT = 5672
+RABBITMQ_PORT = 5672
 
 
 class Fetcher:
@@ -55,6 +62,10 @@ class Fetcher:
             response = requests.get(url)
             response.raise_for_status()  # Raise an exception for HTTP errors
             html_content = response.text
+            logger.info(f"Successfully fetched and saved: {url}")
+
+            # Save the URL into MongoDB
+            links_collection.insert_one({"url": url, "status": "fetched"})
 
             # Save the HTML content locally
             self.save_html(url, html_content)
@@ -102,103 +113,8 @@ class Fetcher:
 # Usage
 if __name__ == "__main__":
     rabbitmq_host = os.environ.get('RABBITMQ_HOST', 'localhost')
-    fetcher = Fetcher(host=rabbitmq_host, port=PORT)
+    fetcher = Fetcher(host=rabbitmq_host, port=RABBITMQ_PORT)
     fetcher.connect()
     fetcher.seed_queue(FIRST_URL)
     fetcher.start()
-
-
-# import pika
-# import time
-# import logging
-# import sys
-
-# # Configure logging
-# logging.basicConfig(
-#     level=logging.INFO,
-#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-#     handlers=[
-#         logging.StreamHandler(sys.stdout)
-#     ]
-# )
-
-# class Fetcher:
-#     def __init__(self, port, queue_name='fetch_queue', host='localhost'):
-#         self.logger = logging.getLogger('Fetcher')
-#         self.logger.info("Initializing Fetcher...")
-#         self.queue_name = queue_name
-#         self.host = host
-#         self.connection = None
-#         self.channel = None
-#         self.port = port
-
-#     def connect(self):
-#         """Connect to RabbitMQ with retry logic."""
-#         self.logger.info("Starting connection process...")
-#         max_retries = 10
-#         retry_delay = 2
-        
-#         for attempt in range(max_retries):
-#             try:
-#                 self.logger.info(f"Attempting to connect to RabbitMQ (attempt {attempt + 1}/{max_retries})...")
-#                 self.connection = pika.BlockingConnection(
-#                     pika.ConnectionParameters(
-#                         host=self.host,
-#                         port=self.port,
-#                         connection_attempts=3,
-#                         retry_delay=1
-#                     )
-#                 )
-#                 self.channel = self.connection.channel()
-#                 self.channel.queue_declare(queue=self.queue_name)
-#                 self.logger.info(f"Successfully connected to RabbitMQ on {self.host}, queue: {self.queue_name}")
-#                 return
-#             except pika.exceptions.AMQPConnectionError as e:
-#                 self.logger.error(f"Connection attempt {attempt + 1} failed: {e}")
-#                 if attempt < max_retries - 1:
-#                     self.logger.info(f"Retrying in {retry_delay} seconds...")
-#                     time.sleep(retry_delay)
-#                 else:
-#                     self.logger.critical("Max retries reached. Could not connect to RabbitMQ")
-#                     raise
-
-#     def send_ping(self):
-#         """Send 'ping' messages to the queue."""
-#         self.logger.info("Starting send_ping method...")
-#         try:
-#             i = 0
-#             while True:
-#                 message = f"ping{i}"
-#                 self.channel.basic_publish(
-#                     exchange='',
-#                     routing_key=self.queue_name,
-#                     body=message
-#                 )
-#                 self.logger.info(f"Fetcher sent: {message}")
-#                 time.sleep(2)
-#                 i += 1
-#         except Exception as e:
-#             self.logger.error(f"Error in send_ping: {str(e)}", exc_info=True)
-#             raise
-#         except KeyboardInterrupt:
-#             self.logger.info("Fetcher stopped.")
-#         finally:
-#             self.close()
-
-#     def close(self):
-#         """Close the connection."""
-#         if self.connection:
-#             self.connection.close()
-#             self.logger.info("Connection closed.")
-
-# if __name__ == "__main__":
-#     logger = logging.getLogger('FetcherMain')
-#     logger.info("Starting Fetcher main...")
-#     fetcher = Fetcher(port=5672, host='rabbitmq')
-#     try:
-#         fetcher.connect()
-#         logger.info("Starting to send pings...")
-#         fetcher.send_ping()
-#     except Exception as e:
-#         logger.error(f"Error in main: {str(e)}", exc_info=True)
 
