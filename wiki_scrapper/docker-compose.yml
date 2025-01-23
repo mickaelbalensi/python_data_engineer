@@ -38,6 +38,7 @@ services:
       - wiki_scraper_network
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -51,6 +52,7 @@ services:
       - wiki_scraper_network
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
       - MONGO_URI=mongodb://mongo:27017
     depends_on:
       rabbitmq:

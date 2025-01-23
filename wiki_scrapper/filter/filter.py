@@ -1,7 +1,7 @@
 import pika
 
-class PongConsumer:
-    def __init__(self, queue_name='parser_queue', host='rabbitmq'):
+class Filter:
+    def __init__(self, queue_name='filter_queue', host='rabbitmq'):
         self.queue_name = queue_name
         self.host = host
         self.connection = None
@@ -21,8 +21,8 @@ class PongConsumer:
         self.channel.start_consuming()
 
     def process_message(self, ch, method, properties, body):
-        """Process messages from the parser_queue."""
-        print(f"Received from parser_queue: {body.decode()}")
+        """Process messages from the filter_queue."""
+        print(f"Received from filter_queue: {body.decode()}")
 
     def close(self):
         """Close the connection."""
@@ -32,6 +32,6 @@ class PongConsumer:
 
 # Usage
 if __name__ == "__main__":
-    consumer = PongConsumer()
+    consumer = Filter()
     consumer.connect()
     consumer.start()
