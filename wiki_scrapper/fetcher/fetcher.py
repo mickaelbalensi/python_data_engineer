@@ -37,18 +37,19 @@ class Fetcher:
         """Connect to RabbitMQ and declare the queues."""
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.host, self.port))
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.consume_queue)
-        self.channel.queue_declare(queue=self.produce_queue)
+        self.channel.queue_declare(queue=self.consume_queue, durable=True)
+        self.channel.queue_declare(queue=self.produce_queue, durable=True)
         logger.info(f"Connected to RabbitMQ on {self.host}, queues: {self.consume_queue}, {self.produce_queue}")
 
     def seed_queue(self, initial_url):
         """Seed the fetch queue with the initial URL."""
-        self.channel.basic_publish(exchange='', routing_key=self.consume_queue, body=initial_url)
+        self.channel.basic_publish(exchange='', routing_key=self.consume_queue, body=initial_url, properties=pika.BasicProperties(
+        delivery_mode=2)) # Make message persistent
         logger.info(f"Initial URL seeded: {initial_url}")
 
     def start(self):
         """Start consuming messages."""
-        self.channel.basic_consume(queue=self.consume_queue, on_message_callback=self.process_message, auto_ack=True)
+        self.channel.basic_consume(queue=self.consume_queue, on_message_callback=self.process_message, auto_ack=False)
         logger.info("Fetcher is consuming...")
         self.channel.start_consuming()
 
@@ -74,10 +75,11 @@ class Fetcher:
 
             # Push extracted links to the parser queue
             for link in links:
-                self.channel.basic_publish(exchange='', routing_key=self.produce_queue, body=link)
+                self.channel.basic_publish(exchange='', routing_key=self.produce_queue, body=link, properties=pika.BasicProperties(delivery_mode=2))
             logger.info(f"Fetched and processed URL: {url}. Links sent to parser queue.")
         except requests.RequestException as e:
             logger.error(f"Failed to fetch URL {url}: {e}")
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
 
     def save_html(self, url, html_content):
         """Save the HTML content to a local file."""

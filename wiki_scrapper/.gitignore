@@ -1,3 +1,6 @@
+
+pseudo*.py
+
 # Python files
 *.pyc
 *.pyo

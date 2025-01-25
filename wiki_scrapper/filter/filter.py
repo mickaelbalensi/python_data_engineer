@@ -28,8 +28,8 @@ class Filter:
             # Connect to RabbitMQ
             self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.rabbitmq_host, self.rabbitmq_port))
             self.channel = self.connection.channel()
-            self.channel.queue_declare(queue=self.consume_queue)
-            self.channel.queue_declare(queue=self.produce_queue)
+            self.channel.queue_declare(queue=self.consume_queue, durable=True)
+            self.channel.queue_declare(queue=self.produce_queue, durable=True)
             logger.info(f"Connected to RabbitMQ on {self.rabbitmq_host}, queues: {self.consume_queue}, {self.produce_queue}")
 
             # Connect to Redis
@@ -42,7 +42,7 @@ class Filter:
     def start(self):
         """Start consuming messages."""
         try:
-            self.channel.basic_consume(queue=self.consume_queue, on_message_callback=self.process_message, auto_ack=True)
+            self.channel.basic_consume(queue=self.consume_queue, on_message_callback=self.process_message, auto_ack=False)
             logger.info(f"Consuming messages from {self.consume_queue}...")
             self.channel.start_consuming()
         except Exception as e:
@@ -64,7 +64,7 @@ class Filter:
             logger.info(f"Added new link to Redis: {link}")
 
             # Publish the unique link to the fetch_queue
-            self.channel.basic_publish(exchange='', routing_key=self.produce_queue, body=link)
+            self.channel.basic_publish(exchange='', routing_key=self.produce_queue, body=link, properties=pika.BasicProperties(delivery_mode=2))
             logger.info(f"Pushed link to {self.produce_queue}: {link}")
         except Exception as e:
             logger.error(f"Error processing message: {e}")

@@ -7,13 +7,16 @@ services:
     networks:
       - wiki_scraper_network
     ports:
-      - "15672:15672"
-      - "5672:5672"
+      - "5672:5672"    # AMQP protocol port
+      - "15672:15672"  # Management plugin web interface
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
       interval: 5s
       timeout: 5s
       retries: 5
+    volumes:
+    - rabbitmq_data:/var/lib/rabbitmq  # Persistent storage
+    
 
   mongo:
     image: mongo:latest
@@ -62,7 +65,7 @@ services:
   fetcher:
     image: mickaelbalensi/fetcher:latest
     build: ./fetcher
-    container_name: fetcher-container
+    #container_name: fetcher-container
     networks:
       - wiki_scraper_network
     environment:
@@ -102,3 +105,4 @@ networks:
 volumes:
   mongo_data:
   redis_data:
+  rabbitmq_data:

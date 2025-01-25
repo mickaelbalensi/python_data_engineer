@@ -26,13 +26,13 @@ class Parser:
         time.sleep(2)
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.host, self.port))
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.produce_queue)
-        self.channel.queue_declare(queue=self.consume_queue)
+        self.channel.queue_declare(queue=self.produce_queue, durable=True)
+        self.channel.queue_declare(queue=self.consume_queue, durable=True)
         logger.info(f"Connected to RabbitMQ on {self.host}, queues: {self.produce_queue}, {self.consume_queue}")
 
     def start(self):
         """Start consuming messages."""
-        self.channel.basic_consume(queue=self.consume_queue, on_message_callback=self.process_message, auto_ack=True)
+        self.channel.basic_consume(queue=self.consume_queue, on_message_callback=self.process_message, auto_ack=False)
         logger.info("Parser is consuming...")
         self.channel.start_consuming()
 
@@ -51,7 +51,7 @@ class Parser:
         logger.info(f"Cleaned URL: {cleaned_url}")
 
         # Send the cleaned URL back to the fetch_queue
-        self.channel.basic_publish(exchange='', routing_key=self.produce_queue, body=cleaned_url)
+        self.channel.basic_publish(exchange='', routing_key=self.produce_queue, body=cleaned_url, properties=pika.BasicProperties(delivery_mode=2))
         logger.info(f"Cleaned URL sent to {self.produce_queue}: {cleaned_url}")
 
     def is_valid_wiki_url(self, url):
