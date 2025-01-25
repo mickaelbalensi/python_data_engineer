@@ -49,6 +49,13 @@ class Fetcher:
 
     def start(self):
         """Start consuming messages."""
+        
+        queue_declare = self.channel.queue_declare(queue=self.consume_queue, passive=True)
+        # logg num of messages
+        logger.info(f"Number of messages in {self.consume_queue}: {queue_declare.method.message_count}")
+        if queue_declare.method.message_count == 0:
+            self.seed_queue(FIRST_URL)
+
         self.channel.basic_consume(queue=self.consume_queue, on_message_callback=self.process_message, auto_ack=False)
         logger.info("Fetcher is consuming...")
         self.channel.start_consuming()
@@ -57,6 +64,7 @@ class Fetcher:
         """Process a message containing a Wikipedia URL, save the HTML, and extract links."""
         url = body.decode()
         logger.info(f"Received URL: {url}")
+
         try:
             # Fetch the HTML content of the URL
             response = requests.get(url)
@@ -117,6 +125,5 @@ if __name__ == "__main__":
     rabbitmq_port = os.environ.get('RABBITMQ_PORT', 5672)
     fetcher = Fetcher(host=rabbitmq_host, port=rabbitmq_port)
     fetcher.connect()
-    fetcher.seed_queue(FIRST_URL)
     fetcher.start()
 

@@ -1,6 +1,6 @@
 
 pseudo*.py
-
+log*
 # Python files
 *.pyc
 *.pyo
