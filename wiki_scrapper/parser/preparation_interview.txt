@@ -1,0 +1,19 @@
+Improvment:
+
+1. Rate limit. why ?
+    - Prevent IP Blocking:         if exceeded, lead to disrupting your project.
+    - API Compliance:              It ensures you follow Wikipedia's terms of service, avoiding misuse.
+    - Infrastructure Stability:    It avoids overwhelming the server, improving the overall stability 
+                                    and reliability of your project.
+    - Ethical Scraping:            It demonstrates responsible behavior when interacting with external systems.
+
+2.
+
+
+
+
+
+
+
+
+
