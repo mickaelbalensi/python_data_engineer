@@ -7,10 +7,33 @@ Improvment:
                                     and reliability of your project.
     - Ethical Scraping:            It demonstrates responsible behavior when interacting with external systems.
 
-2.
+How to do:
+    1.  Throttling Requests: sleep between each fetch request
+    2.  @sleep_and_retry
+        @limits(calls=60, period=ONE_MINUTE)  # Limit to 60 requests per minute
+    3.  implement how to calculate
 
+-------------------------------
+2.  how to validate the page is fetch correctly ?
+    - check status of the response 200
+    - check empty content
+    - check known tags like <title>, <body>
+    - check min words
 
+3.  Circuit Breaker
+    - if wikipedia become unresponsive, we would stop sending requests
+    - save resources
+    - protect project for cascading errors caused by timeouts or delays
 
+where:
+    - wikipedia request ?
+    - reddis/mongo failure ?    
+
+How to solve:
+    - implement limit of failure in time interval 
+        - when the call of request raises an exception, i will count number up to threshold
+
+4.  
 
 
 

@@ -1,0 +1,63 @@
+sudo apt update
+sudo apt install openjdk-8-jdk
+
+sudo adduser hadoop
+sudo usermod -aG sudo hadoop
+su - hadoop
+
+wget https://downloads.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz
+tar -xzf hadoop-3.3.6.tar.gz
+mv hadoop-3.3.6 hadoop
+
+
+export HADOOP_HOME=/home/hadoop/hadoop
+export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+
+nano $HADOOP_HOME/etc/hadoop/core-site.xml
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9000</value>
+    </property>
+</configuration>
+
+
+
+nano $HADOOP_HOME/etc/hadoop/hdfs-site.xml
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+</configuration>
+
+
+$HADOOP_HOME/etc/hadoop/
+
+/home/hadoop/hadoop/etc/hadoop/core-site.xml
+/home/hadoop/hadoop/etc/hadoop/hdfs-site.xml
+
+
+sudo apt install openssh-server
+ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 0600 ~/.ssh/authorized_keys
+
+hdfs namenode -format
+start-dfs.sh
+
+# Copy default dictionary
+hdfs dfs -mkdir /dictionary
+hdfs dfs -put /usr/share/dict/american-english /dictionary/
+
+# Verify upload
+hdfs dfs -ls /dictionary
+
+# Create duplicate
+hdfs dfs -cp /dictionary/american-english /dictionary/american-english-copy
+
+# Verify both files
+hdfs dfs -ls /dictionary
+
