@@ -1,3 +1,11 @@
+I. Already installed -> just 'Login':
+	su - hadoop
+	start-dfs.sh
+	jps
+	hdfs dfs -ls /
+
+II. Not install yet, here to install :
+
 sudo apt update
 sudo apt install openjdk-8-jdk
 
