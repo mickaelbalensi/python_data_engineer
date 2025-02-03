@@ -1,1 +1,54 @@
+hadoop-3.3.6*
+pseudo*.py
+log*
 *.csv
+*.cmd
+*.xml
+*.sh
+*.h
+*.hh
+
+
+# Python files
+*.pyc
+*.pyo
+__pycache__/
+*.log
+
+# Docker
+docker-compose.override.yml
+.env
+
+# Logs
+*.log
+!filter.log  # If you want to keep this specific log file
+
+# Virtual environments
+venv/
+env/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# HTML pages (assuming these are generated or fetched and not source files)
+html_pages/
+
+# Ignore any output files
+output/
+*.out
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Filter specific
+filter/__pycache__/
+
+# Parser specific
+parser/__pycache__/
+
+# Fetcher specific
+fetcher/__pycache__/

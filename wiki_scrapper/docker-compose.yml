@@ -49,7 +49,7 @@ services:
       # - redis_data:/data
 
   parser:
-    image: mickaelbalensi/parser:latest
+    #image: mickaelbalensi/parser:latest
     build: ./parser
     container_name: parser-container
     networks:
@@ -63,7 +63,7 @@ services:
       
 
   fetcher:
-    image: mickaelbalensi/fetcher:latest
+    #image: mickaelbalensi/fetcher:latest
     build: ./fetcher
     #container_name: fetcher-container
     networks:
@@ -81,7 +81,7 @@ services:
       - ./html_pages:/app/html_pages
 
   filter:
-    image: mickaelbalensi/filter:latest
+    #image: mickaelbalensi/filter:latest
     build:
       context: ./filter
     container_name: filter-container
