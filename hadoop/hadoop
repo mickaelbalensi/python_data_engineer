@@ -1,6 +1,7 @@
 I. Already installed -> just 'Login':
 	su - hadoop
 	start-dfs.sh
+    start-yarn.sh
 	jps
 	hdfs dfs -ls /
 

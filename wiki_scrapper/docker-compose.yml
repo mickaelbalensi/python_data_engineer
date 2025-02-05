@@ -17,7 +17,6 @@ services:
     volumes:
     - rabbitmq_data:/var/lib/rabbitmq  # Persistent storage
     
-
   mongo:
     image: mongo:latest
     container_name: mongo
@@ -32,6 +31,24 @@ services:
       retries: 5
     volumes:
       - mongo_data:/data/db
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: wiki_scraper_db
+    ports:
+      - "3306:3306"
+    networks:
+      - wiki_scraper_network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:latest
@@ -61,7 +78,6 @@ services:
       rabbitmq:
         condition: service_healthy
       
-
   fetcher:
     #image: mickaelbalensi/fetcher:latest
     build: ./fetcher
@@ -106,3 +122,4 @@ volumes:
   mongo_data:
   redis_data:
   rabbitmq_data:
+  mysql_data:
