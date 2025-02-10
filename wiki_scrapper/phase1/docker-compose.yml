@@ -32,23 +32,23 @@ services:
     volumes:
       - mongo_data:/data/db
 
-  mysql:
-    image: mysql:8
-    container_name: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: wiki_scraper_db
-    ports:
-      - "3306:3306"
-    networks:
-      - wiki_scraper_network
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "--silent"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # mysql:
+  #   image: mysql:8
+  #   container_name: mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: rootpassword
+  #     MYSQL_DATABASE: wiki_scraper_db
+  #   ports:
+  #     - "3306:3306"
+  #   networks:
+  #     - wiki_scraper_network
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "--silent"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
 
   redis:
     image: redis:latest
@@ -113,6 +113,24 @@ services:
       - RABBITMQ_PORT=5672
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+
+  categorizer:
+      build:
+        context: ./categorizer
+      container_name: categorizer-container
+      # depends_on:
+      #   mysql:
+      #     condition: service_healthy
+
+      networks:
+        - wiki_scraper_network
+      environment:
+        - MYSQL_HOST=mysql
+        - MYSQL_USER=root
+        - MYSQL_PASSWORD=rootpassword
+        - MYSQL_DB=wiki_scraper_db
+      volumes:
+        - ./html_pages:/app/html_pages
 
 networks:
   wiki_scraper_network:
