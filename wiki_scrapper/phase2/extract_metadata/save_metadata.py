@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Define local HTML folder
-LOCAL_HTML_FOLDER = os.path.abspath("../../html_pages")
+LOCAL_HTML_FOLDER = "/home/studen/mickael/python_data_engineer/wiki_scrapper/html_pages"
 
 def create_spark_session():
     """Creates and returns a Spark session"""
