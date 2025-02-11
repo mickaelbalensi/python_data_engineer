@@ -32,6 +32,7 @@ services:
     volumes:
       - mongo_data:/data/db
 
+<<<<<<< HEAD:wiki_scrapper/docker-compose.yml
   mysql:
     image: mysql:8.0
     container_name: mysql_db
@@ -55,6 +56,25 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+=======
+  # mysql:
+  #   image: mysql:8
+  #   container_name: mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: rootpassword
+  #     MYSQL_DATABASE: wiki_scraper_db
+  #   ports:
+  #     - "3306:3306"
+  #   networks:
+  #     - wiki_scraper_network
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "--silent"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+>>>>>>> 0b5638c3a001be8352eb683578faf3973a92575e:wiki_scrapper/phase1/docker-compose.yml
 
   redis:
     image: redis:latest
@@ -121,6 +141,7 @@ services:
       - REDIS_PORT=6379
 
   categorizer:
+<<<<<<< HEAD:wiki_scrapper/docker-compose.yml
     build:
       context: ./categorizer
     container_name: categorizer-container
@@ -137,6 +158,24 @@ services:
       - MYSQL_DB=wiki_scraper_db
     volumes:
       - ./html_pages:/app/html_pages
+=======
+      build:
+        context: ./categorizer
+      container_name: categorizer-container
+      # depends_on:
+      #   mysql:
+      #     condition: service_healthy
+
+      networks:
+        - wiki_scraper_network
+      environment:
+        - MYSQL_HOST=mysql
+        - MYSQL_USER=root
+        - MYSQL_PASSWORD=rootpassword
+        - MYSQL_DB=wiki_scraper_db
+      volumes:
+        - ./html_pages:/app/html_pages
+>>>>>>> 0b5638c3a001be8352eb683578faf3973a92575e:wiki_scrapper/phase1/docker-compose.yml
 
 networks:
   wiki_scraper_network:
