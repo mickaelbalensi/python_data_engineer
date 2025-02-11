@@ -208,8 +208,6 @@ def connect_to_mysql(max_retries=5, retry_delay=5):
                 logger.error("Maximum retry attempts reached. Could not connect to MySQL.")
                 return None
 
-
-# Main script execution
 conn = connect_to_mysql()
 if conn:
     process_html_folder_with_spark(conn)
@@ -217,49 +215,42 @@ if conn:
     logger.info("Database connection closed.")
 
 
-# import os
-# import logging
-# import time
-# import mysql.connector
-# from mysql.connector import Error
-# from bs4 import BeautifulSoup
+# 
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime, timedelta
+import subprocess
 
-# # Configure logging
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-# logger = logging.getLogger(__name__)
+SCRIPT_PATH = "/home/studen/mickael/python_data_engineer/wiki_scrapper/phase2/extract_metadata/save_metadata.py"
 
-# # Define local HTML folder (use absolute path for reliability)
+# Define default arguments
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': datetime(2024, 2, 10),  # Start date of the DAG
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
 
+# Define DAG
+dag = DAG(
+    'wiki_metadata_pipeline',
+    default_args=default_args,
+    description='Extract and store metadata from HTML files',
+    schedule_interval='@daily',  # Run every day
+    catchup=False
+)
 
-# def insert_html_page(connection, url):
-#     """Inserts an HTML page into the database and returns its ID."""
-#     cursor = connection.cursor()
-#     insert_query = """INSERT INTO htmlpage_table (url) VALUES (%s)"""
-    
-#     cursor.execute(insert_query, (url,))  # Pass a tuple (url,)
-#     connection.commit()
-    
-#     logger.info(f"Inserted HTML page: {url}")
-#     return cursor.lastrowid
+def run_script():
+    """Executes the metadata extraction script."""
+    subprocess.run(["python3", SCRIPT_PATH], check=True)
 
+# Define tasks
+extract_metadata_task = PythonOperator(
+    task_id='extract_metadata',
+    python_callable=run_script,
+    dag=dag
+)
 
-# def extract_categories_from_html(html_content):
-#     """Extracts categories from a Wikipedia HTML page."""
-#     soup = BeautifulSoup(html_content, 'html.parser')
-    
-#     # Find the category section in Wikipedia HTML
-#     category_section = soup.find('div', {'id': 'mw-normal-catlinks'})
-    
-#     categories = []
-#     if category_section:
-#         category_links = category_section.find_all('a')[1:]  # Skip "Categories"
-#         categories = [link.get_text().strip() for link in category_links]
-
-#     logger.debug(f"Extracted categories: {categories}")
-#     return categories
-
-
-
-
-
-
+# Task execution order (only one task for now)
+extract_metadata_task
