@@ -46,6 +46,11 @@ class Parser:
             logger.info(f"URL rejected (not a wiki URL): {message}")
             return
 
+        # Filter only English Wikipedia pages
+        if not message.startswith("https://en.wikipedia.org/wiki/"):
+            logger.info(f"Non-English Wikipedia page ignored: {message}")
+            return
+    
         # Clean the URL by removing fragments and query parameters
         cleaned_url = self.clean_url(message)
         logger.info(f"Cleaned URL: {cleaned_url}")

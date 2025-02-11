@@ -33,19 +33,25 @@ services:
       - mongo_data:/data/db
 
   mysql:
-    image: mysql:8
-    container_name: mysql
+    image: mysql:8.0
+    container_name: mysql_db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: wiki_scraper_db
+      MYSQL_USER: user              
+      MYSQL_PASSWORD: password 
     ports:
       - "3306:3306"
     networks:
       - wiki_scraper_network
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+      # - ./mysql-config/my.cnf:/etc/mysql/my.cnf
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "--silent"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -113,6 +119,24 @@ services:
       - RABBITMQ_PORT=5672
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+
+  categorizer:
+    build:
+      context: ./categorizer
+    container_name: categorizer-container
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    networks:
+      - wiki_scraper_network
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_DB=wiki_scraper_db
+    volumes:
+      - ./html_pages:/app/html_pages
 
 networks:
   wiki_scraper_network:
