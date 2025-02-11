@@ -48,10 +48,11 @@ def connect_to_mysql(max_retries=5, retry_delay=5):
 def insert_html_page(connection, url):
     """Inserts an HTML page into the database and returns its ID."""
     cursor = connection.cursor()
-    insert_query = """INSERT INTO htmlpage_table (url)
-                      VALUES %s"""
-    cursor.execute(insert_query, url)
+    insert_query = """INSERT INTO htmlpage_table (url) VALUES (%s)"""
+    
+    cursor.execute(insert_query, (url,))  # Pass a tuple (url,)
     connection.commit()
+    
     logger.info(f"Inserted HTML page: {url}")
     return cursor.lastrowid
 
@@ -133,3 +134,6 @@ if conn:
     process_html_folder(conn)
     conn.close()
     logger.info("Database connection closed.")
+
+
+
