@@ -34,6 +34,17 @@ How to solve:
         - when the call of request raises an exception, i will count number up to threshold
 
 4.  
+---------------------------
+
+
+
+
+
+
+
+
+
+
 
 
 

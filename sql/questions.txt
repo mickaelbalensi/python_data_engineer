@@ -2,8 +2,6 @@ https://leetcode.com/problems/employees-earning-more-than-their-managers/descrip
 https://leetcode.com/problems/department-top-three-salaries/description/
 
 
-
-
 https://leetcode.com/problems/human-traffic-of-stadium/description/
 https://leetcode.com/problems/trips-and-users/description/
 https://leetcode.com/problems/department-highest-salary/description/

@@ -1,0 +1,36 @@
+Research:
+
+1. How data work for tesla, uber eats, airbnb
+
+
+
+Advantage:
+1. Need know java, shell, python
+2. Knowledge on ML models: 
+    -   supervised :
+        * Linear Regression, 
+        * Polynomial Regression
+        * SVM Support Vector Machine Regression
+        * Decision Tree Regression
+        * Random Forest Regression
+        * Logistic
+        
+    -   unsupervised 
+        * K-means clustering
+
+    Apriori algo
+
+3. DevOps tres utiles pour automatisation de task
+    - airflow
+    - cicd
+    - container
+
+4. Spark, Algo
+5. Cloud (AWS, Azure)
+6. Maths 
+
+
+
+
+
+
