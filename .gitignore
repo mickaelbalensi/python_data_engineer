@@ -8,6 +8,8 @@ log*
 *.h
 *.hh
 
+# aws ec2 k
+MyEC2Key.pem
 
 # Python files
 *.pyc
