@@ -11,6 +11,9 @@ log*
 # aws ec2 k
 MyEC2Key.pem
 
+# aws
+/aws
+
 # Python files
 *.pyc
 *.pyo

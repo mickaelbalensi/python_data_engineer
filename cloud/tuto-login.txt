@@ -1,0 +1,19 @@
+1. List instance of ec2:
+    - from terminal enter and retrieve instance beginning by "i-xxxxxxxxxxxxx":
+    aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name]'
+
+2. copy the ec2 instance "i-xxxxxxxxxxxxx"
+3. start this instance by running:
+    aws ec2 start-instances --instance-ids i-xxxxxxxxxxxxx
+
+4. retrieve the public IP of the instance by running:
+    aws ec2 describe-instances --instance-ids i-xxxxxxxxxxxxx --query "Reservations[0].Instances[0].{ID:InstanceId,Type:InstanceType,PublicIP:PublicIpAddress,State:State.Name}"
+
+5. connect to ssh from another terminal:
+    - go to directory where the ec2 key (the .pem file is stored/here in cloud directory)
+    - run the following command and replace PUBLIC-IP by the good onecfrom last command (4.):
+      ssh -i (.pem file) ec2-user@PUBLIC-IP
+
+6. from first terminal (not ssh) stop the terminal
+    aws ec2 stop-instances --instance-ids i-xxxxxxxxxxxxxx
+
