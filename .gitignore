@@ -10,6 +10,7 @@ log*
 
 # aws ec2 k
 MyEC2Key.pem
+*.pem
 
 # aws
 /aws
