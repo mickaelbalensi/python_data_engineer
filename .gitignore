@@ -8,6 +8,10 @@ log*
 *.h
 *.hh
 
+#cloud
+cloud/airflow*
+cloud/standalone*.txt
+
 # aws ec2 k
 MyEC2Key.pem
 *.pem
