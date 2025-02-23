@@ -8,6 +8,9 @@ log*
 *.h
 *.hh
 
+#env
+/aws-env
+
 # aws ec2 k
 MyEC2Key.pem
 *.pem
