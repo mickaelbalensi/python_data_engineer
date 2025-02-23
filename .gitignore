@@ -8,8 +8,14 @@ log*
 *.h
 *.hh
 
+<<<<<<< HEAD
 #env
 /aws-env
+=======
+#cloud
+cloud/airflow*
+cloud/standalone*.txt
+>>>>>>> 89cc05b7c4a8b8d59ecb508b68eb27e979c15ba8
 
 # aws ec2 k
 MyEC2Key.pem
