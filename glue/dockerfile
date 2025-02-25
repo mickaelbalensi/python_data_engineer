@@ -1,0 +1,20 @@
+FROM amazon/aws-glue-libs:glue_libs_4.0.0_image_01
+
+# Set up work directory
+WORKDIR /glue-scripts
+
+# Copy the Glue script and requirements file
+COPY requirements.txt /glue-scripts/
+
+# Install additional dependencies from requirements.txt
+RUN python3 -m pip install -r requirements.txt
+
+# Set up AWS credentials (use environment variables in production)
+ENV AWS_ACCESS_KEY_ID=
+ENV AWS_SECRET_ACCESS_KEY=
+ENV AWS_REGION=
+
+COPY spotify_etl.py /glue-scripts/
+
+# Command to run the ETL job
+CMD ["spark-submit", "--master", "local[*]", "spotify_etl.py"]
