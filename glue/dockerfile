@@ -9,11 +9,6 @@ COPY requirements.txt /glue-scripts/
 # Install additional dependencies from requirements.txt
 RUN python3 -m pip install -r requirements.txt
 
-# Set up AWS credentials (use environment variables in production)
-ENV AWS_ACCESS_KEY_ID=
-ENV AWS_SECRET_ACCESS_KEY=
-ENV AWS_REGION=
-
 COPY spotify_etl.py /glue-scripts/
 
 # Command to run the ETL job
