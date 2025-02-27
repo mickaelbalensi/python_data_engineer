@@ -92,7 +92,7 @@ get_latest_file = PythonOperator(
         'prefix': S3_KEY_PREFIX,
         'aws_access_key_id': '{{ conn.aws_default.login }}',
         'aws_secret_access_key': '{{ conn.aws_default.password }}',
-        'region': 'us-east-1'
+        'region': 'eu-north-1'
     },
     provide_context=True,
     dag=dag
@@ -102,23 +102,14 @@ get_latest_file = PythonOperator(
 load_to_dynamodb = BashOperator(
     task_id="load_s3_to_dynamodb",
     bash_command="""
-        cd {path} && \
+        cd /home/mickael/data_engineer/dynamodb && \
         export LATEST_S3_KEY="{{ task_instance.xcom_pull(task_ids='get_latest_s3_file', key='latest_s3_file') }}" && \
         echo "Processing latest file: $LATEST_S3_KEY" && \
-        docker-compose up --build
-    """.format(path=DOCKER_COMPOSE_PATH),
+        docker compose build && \
+        docker compose run --rm s3-to-dynamodb
+    """,
     dag=dag
 )
-
-# Set task dependencies
-wait_for_output >> get_latest_file >> load_to_dynamodb
-
-
-
-
-
-
-
 
 # load_to_redshift = S3ToRedshiftOperator(
 #     task_id="copy_data_to_redshift",
@@ -144,8 +135,12 @@ final_success_task = PythonOperator(
     dag=dag
 )
 
+# Set task dependencies
+run_local_glue >> wait_for_output >>get_latest_file >> load_to_dynamodb >> final_success_task
+
+
+
 # run_local_glue >> wait_for_output >> final_success_task
-load_to_redshift
 
 # Set task dependencies
 # run_local_glue >> wait_for_output >> load_to_redshift

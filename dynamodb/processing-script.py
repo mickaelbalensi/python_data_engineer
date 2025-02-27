@@ -24,6 +24,26 @@ aws_access_key = os.environ.get('AWS_ACCESS_KEY_ID')
 aws_secret_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
 aws_region = os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')
 
+def fetch_data_from_dynamodb(table_name, dynamodb):
+    """Fetches and prints data from the specified DynamoDB table."""
+    try:
+        table = dynamodb.Table(table_name)
+        response = table.scan()
+        items = response.get('Items', [])
+        
+        if not items:
+            logger.info(f"No records found in {table_name}")
+        else:
+            logger.info(f"Retrieved {len(items)} records from {table_name}")
+            for item in items:
+                logger.info(item)  # Print each item
+
+    except Exception as e:
+        logger.error(f"Error retrieving data from {table_name}: {str(e)}")
+
+
+# Call this function after loading data into DynamoDB
+
 def main():
     try:
         logger.info("Starting S3 to DynamoDB transfer process")
@@ -182,9 +202,13 @@ def main():
         
         logger.info("S3 to DynamoDB transfer process completed successfully")
     
+        # Fetch and print data from DynamoDB
+        fetch_data_from_dynamodb(dynamodb_table, dynamodb)
+
     except Exception as e:
         logger.error(f"Error in S3 to DynamoDB transfer: {str(e)}")
         raise
 
+    
 if __name__ == "__main__":
     main()
