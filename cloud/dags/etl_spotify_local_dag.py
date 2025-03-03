@@ -137,11 +137,3 @@ final_success_task = PythonOperator(
 
 # Set task dependencies
 run_local_glue >> wait_for_output >>get_latest_file >> load_to_dynamodb >> final_success_task
-
-
-
-# run_local_glue >> wait_for_output >> final_success_task
-
-# Set task dependencies
-# run_local_glue >> wait_for_output >> load_to_redshift
-# run_local_glue >> wait_for_output >> 

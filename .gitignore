@@ -13,7 +13,7 @@ log*
 #cloud
 cloud/airflow*
 cloud/standalone*.txt
-
+lambda install/lambda/*
 # aws ec2 k
 MyEC2Key.pem
 *.pem

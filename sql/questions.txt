@@ -1,13 +1,10 @@
 https://leetcode.com/problems/employees-earning-more-than-their-managers/description/
 https://leetcode.com/problems/department-top-three-salaries/description/
-
-
 https://leetcode.com/problems/human-traffic-of-stadium/description/
 https://leetcode.com/problems/trips-and-users/description/
 https://leetcode.com/problems/department-highest-salary/description/
 https://leetcode.com/problems/consecutive-numbers/description/
 https://leetcode.com/problems/rank-scores/description/
-
 https://www.hackerrank.com/challenges/weather-observation-station-1/problem
 https://www.hackerrank.com/challenges/the-company/problem
 https://www.hackerrank.com/challenges/the-report/problem
